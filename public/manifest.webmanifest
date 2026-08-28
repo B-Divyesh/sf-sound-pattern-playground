@@ -3,7 +3,7 @@
   "name": "Sound Pattern Playground",
   "short_name": "Sound Patterns",
   "description": "Collect three sounds, inspect their features, and challenge a transparent local classifier.",
-  "start_url": "/?source=pwa&v=1",
+  "start_url": "/?source=pwa&v=2",
   "scope": "/",
   "display": "standalone",
   "orientation": "any",

@@ -8,6 +8,8 @@ nearest-neighbor baseline and inspect every vote.
 
 Live product: <https://sound-pattern-playground.sociobot.in>
 
+One-click sample demo: <https://sound-pattern-playground.sociobot.in/demo>
+
 ## Why it exists
 
 Audio tutorials often jump from a recording to a model result. This playground
@@ -31,6 +33,12 @@ identity, medical, surveillance, or safety classifier.
 - Includes `/privacy/` and `/terms/` pages. There is no account, tracking,
   third-party runtime script, CDN font, or cloud inference.
 
+Every statement above maps to a clean-browser test in
+[`.factory/claims.json`](.factory/claims.json). The tests use `/demo`, which
+starts with a desk tap, bottle hum, hand clap, and one test tap. Demo data uses
+the separate `demo:sound-pattern-playground` IndexedDB database. **Start for
+real** deletes that database before opening the real collection.
+
 ## Develop
 
 Requirements: Node.js 20+ and a current Chromium, Firefox, or Safari browser.
@@ -38,7 +46,7 @@ Microphone capture requires HTTPS in production; `localhost` is treated as a
 secure context during development.
 
 ```sh
-npm install
+npm ci
 npm run dev
 ```
 
@@ -49,14 +57,15 @@ microphone permission prompt.
 
 ```sh
 npm test
+npm run typecheck
 npm run build
 ```
 
-`npm test` runs feature/classifier unit tests and Playwright end-to-end tests for
-the full capture/classification/export path, axe accessibility, a 390 px layout,
-console errors, and an offline service-worker reload. Playwright 1.58.2 is
-pinned; its Chromium browser must be installed when it is not supplied by the
-worker environment.
+`npm test` runs feature, import-validation, deployment-contract, and Playwright
+tests. Browser coverage includes every claim, the full capture and export path,
+axe checks, keyboard focus, a 390 px layout, console errors, and offline reload.
+Playwright 1.58.2 is pinned. Its Chromium browser must be installed when the
+worker environment does not supply it.
 
 The exact production build command is `npm run build`. It emits the static site
 to `dist/`, with `dist/index.html` at its root. Preview it locally with:

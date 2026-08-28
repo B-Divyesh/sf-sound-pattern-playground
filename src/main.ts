@@ -1,7 +1,9 @@
 import './style.css';
 import { drawMfcc, drawSpectrogram, drawTinyWaveform, drawWaveform, describeFeatures } from './charts';
-import { clearSamples, clearSettings, getLabels, getSamples, removeSample, saveLabels, saveSample, saveSamples } from './db';
+import { clearSamples, clearSettings, deleteDemoDatabase, DEMO_MODE, getLabels, getSamples, importDataset, isDemoSeeded, markDemoSeeded, removeSample, removeSamples, saveLabels, saveSample, saveSamples } from './db';
+import { createDemoSamples, DEMO_LABELS } from './demo';
 import { buildFeatures, classify, observationFor } from './features';
+import { isImportedPayload, isStoredSample, labelsAreValid, materializeImportedSamples } from './import-data';
 import type { Classification, SoundSample } from './models';
 
 const DEFAULT_LABELS = ['Tap', 'Hum', 'Clap'];
@@ -79,8 +81,7 @@ function readyToClassify(): boolean {
 }
 
 function validLabels(labels = state.labels): boolean {
-  const clean = labels.map((label) => label.trim());
-  return clean.every(Boolean) && new Set(clean.map((label) => label.toLocaleLowerCase())).size === 3;
+  return labelsAreValid(labels);
 }
 
 function renderLabels(): void {
@@ -443,15 +444,6 @@ function blobToDataUrl(blob: Blob): Promise<string> {
   });
 }
 
-function dataUrlToBlob(dataUrl: string): Blob {
-  const [header, encoded] = dataUrl.split(',');
-  const mimeType = header.match(/data:([^;]+)/)?.[1] ?? 'audio/webm';
-  const binary = atob(encoded);
-  const bytes = new Uint8Array(binary.length);
-  for (let index = 0; index < binary.length; index += 1) bytes[index] = binary.charCodeAt(index);
-  return new Blob([bytes], { type: mimeType });
-}
-
 async function exportJson(): Promise<void> {
   if (state.samples.length === 0) {
     setStatus('Record at least one sound before exporting a dataset.', 'error');
@@ -480,19 +472,6 @@ function exportCsv(): void {
   setStatus(`Exported visible features for ${state.samples.length} recordings.`, 'success');
 }
 
-interface ImportedPayload {
-  schemaVersion: number;
-  labels: string[];
-  samples: Array<Omit<SoundSample, 'audio'> & { audioData: string }>;
-}
-
-function isImportedPayload(value: unknown): value is ImportedPayload {
-  if (!value || typeof value !== 'object') return false;
-  const payload = value as Partial<ImportedPayload>;
-  return payload.schemaVersion === 1 && Array.isArray(payload.labels) && payload.labels.length === 3 && Array.isArray(payload.samples)
-    && payload.samples.every((sample) => typeof sample?.id === 'string' && typeof sample?.audioData === 'string' && Array.isArray(sample?.vector));
-}
-
 async function importJson(file: File): Promise<void> {
   if (file.size > 50 * 1024 * 1024) {
     setStatus('That dataset is over 50 MB. Import a smaller playground export.', 'error');
@@ -501,10 +480,10 @@ async function importJson(file: File): Promise<void> {
   try {
     const payload: unknown = JSON.parse(await file.text());
     if (!isImportedPayload(payload) || !validLabels(payload.labels)) throw new Error('Invalid schema');
+    const imported = materializeImportedSamples(payload);
     const confirmed = window.confirm(`Import ${payload.samples.length} recordings? They will merge with this collection; matching recording IDs will be replaced.`);
     if (!confirmed) return;
-    const imported = payload.samples.map(({ audioData, ...sample }) => ({ ...sample, audio: dataUrlToBlob(audioData) })) as SoundSample[];
-    await Promise.all([saveSamples(imported), saveLabels(payload.labels)]);
+    await importDataset(imported, payload.labels);
     const merged = new Map(state.samples.map((sample) => [sample.id, sample]));
     imported.forEach((sample) => merged.set(sample.id, sample));
     state.samples = [...merged.values()];
@@ -514,6 +493,21 @@ async function importJson(file: File): Promise<void> {
   } catch {
     setStatus('That file is not a valid Sound Pattern Playground dataset.', 'error');
   }
+}
+
+async function resetDemo(): Promise<void> {
+  const samples = createDemoSamples();
+  await Promise.all([clearSamples(), clearSettings()]);
+  await importDataset(samples, DEMO_LABELS);
+  await markDemoSeeded();
+  state.labels = [...DEMO_LABELS];
+  state.samples = samples;
+  state.selectedId = samples.at(-1)?.id ?? null;
+  state.activeIndex = 0;
+  state.mysteryMode = false;
+  renderAll();
+  if (state.selectedId) selectSample(state.selectedId);
+  setStatus('Demo reset to four sample recordings.', 'success');
 }
 
 async function eraseEverything(): Promise<void> {
@@ -566,6 +560,12 @@ function setupEvents(): void {
   const dialog = element<HTMLDialogElement>('erase-dialog');
   element<HTMLButtonElement>('erase-all').addEventListener('click', () => dialog.showModal());
   element<HTMLButtonElement>('confirm-erase').addEventListener('click', () => void eraseEverything());
+  element<HTMLButtonElement>('reset-demo').addEventListener('click', () => void resetDemo().catch(() => {
+    setStatus('The demo could not reset. Reload and try again.', 'error');
+  }));
+  element<HTMLButtonElement>('start-real').addEventListener('click', () => void deleteDemoDatabase().finally(() => {
+    window.location.assign('/#field-kit');
+  }));
   window.addEventListener('resize', () => {
     const sample = state.samples.find((entry) => entry.id === state.selectedId);
     if (sample) selectSample(sample.id);
@@ -603,6 +603,15 @@ function setupServiceWorker(): void {
 }
 
 async function initialize(): Promise<void> {
+  if (DEMO_MODE) {
+    document.body.classList.add('demo-mode');
+    element('demo-banner').hidden = false;
+    document.title = 'Demo — Sound Pattern Playground';
+    document.querySelector<HTMLLinkElement>('link[rel="canonical"]')?.setAttribute('href', 'https://sound-pattern-playground.sociobot.in/demo');
+    document.querySelector<HTMLMetaElement>('meta[property="og:title"]')?.setAttribute('content', 'Demo — Sound Pattern Playground');
+    document.querySelector<HTMLMetaElement>('meta[property="og:url"]')?.setAttribute('content', 'https://sound-pattern-playground.sociobot.in/demo');
+    document.querySelector<HTMLMetaElement>('meta[name="twitter:title"]')?.setAttribute('content', 'Demo — Sound Pattern Playground');
+  }
   drawWaveform(liveCanvas, Array.from({ length: 160 }, () => 0), true);
   setupEvents();
   updateNetworkStatus();
@@ -610,14 +619,27 @@ async function initialize(): Promise<void> {
   window.addEventListener('offline', updateNetworkStatus);
   setupServiceWorker();
   try {
-    const [labels, samples] = await Promise.all([getLabels(), getSamples()]);
+    let [labels, rawSamples] = await Promise.all([getLabels(), getSamples()]);
+    if (DEMO_MODE && !(await isDemoSeeded())) {
+      const demoSamples = createDemoSamples();
+      rawSamples = demoSamples;
+      labels = [...DEMO_LABELS];
+      await importDataset(demoSamples, labels);
+      await markDemoSeeded();
+    }
+    const invalidIds = rawSamples.filter((sample) => !isStoredSample(sample)).map((sample) => {
+      if (!sample || typeof sample !== 'object' || !('id' in sample)) return '';
+      return typeof sample.id === 'string' ? sample.id : '';
+    }).filter(Boolean);
+    if (invalidIds.length > 0) await removeSamples(invalidIds);
+    const samples = rawSamples.filter(isStoredSample);
     if (labels && validLabels(labels)) state.labels = labels;
     state.samples = samples;
     renderAll();
     if (samples.length > 0) {
       const latest = [...samples].sort((left, right) => right.createdAt.localeCompare(left.createdAt))[0];
       selectSample(latest.id);
-      setStatus(`Restored ${samples.length} local ${samples.length === 1 ? 'recording' : 'recordings'}.`, 'success');
+      setStatus(DEMO_MODE ? 'Loaded four sample recordings in the demo sandbox.' : `Restored ${samples.length} local ${samples.length === 1 ? 'recording' : 'recordings'}.`, 'success');
     }
   } catch {
     renderAll();

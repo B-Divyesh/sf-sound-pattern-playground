@@ -4,28 +4,45 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="theme-color" content="#071311" />
-    <meta name="description" content="Record short sounds, see their features, and teach a tiny private classifier—all on your device." />
+    <meta name="description" content="Compare three sounds, inspect their visible features, and test a simple classifier in your browser." />
+    <link rel="canonical" href="https://sound-pattern-playground.sociobot.in/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Sound Pattern Playground — Compare sound patterns" />
+    <meta property="og:description" content="Compare three sounds, inspect their visible features, and test a simple classifier in your browser." />
+    <meta property="og:url" content="https://sound-pattern-playground.sociobot.in/" />
+    <meta property="og:image" content="https://sound-pattern-playground.sociobot.in/assets/social-card.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="A microphone and field recorder beside a moonlit wetland with sound ripples on the water" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Sound Pattern Playground — Compare sound patterns" />
+    <meta name="twitter:description" content="Compare three sounds, inspect their visible features, and test a simple classifier in your browser." />
+    <meta name="twitter:image" content="https://sound-pattern-playground.sociobot.in/assets/social-card.jpg" />
     <link rel="manifest" href="/manifest.webmanifest" />
     <link rel="icon" href="/icon.svg" type="image/svg+xml" />
-    <link rel="apple-touch-icon" href="/icons/icon-192.png" />
-    <link rel="preload" href="/assets/field-station-960.webp" as="image" type="image/webp" fetchpriority="high" />
-    <title>Sound Pattern Playground — See what a tiny classifier hears</title>
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+    <title>Sound Pattern Playground — Compare sound patterns</title>
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to playground</a>
+    <aside class="demo-banner" id="demo-banner" aria-label="Demo mode" hidden>
+      <p><b>Demo — sample data, nothing is saved to your collection.</b></p>
+      <div><button type="button" id="reset-demo">Reset demo</button><button type="button" id="start-real">Start for real</button></div>
+    </aside>
     <header class="site-header">
       <a class="brand" href="/" aria-label="Sound Pattern Playground home">
         <svg aria-hidden="true" viewBox="0 0 40 40"><path d="M20 5v19m-6-13v8a6 6 0 0 0 12 0v-8M10 30c6 3 14 3 20 0M7 35c8 4 18 4 26 0"/></svg>
         <span>Sound Pattern<br /><em>Playground</em></span>
       </a>
       <nav aria-label="Primary">
+        <a href="/demo">Demo</a>
         <a href="#field-kit">Field kit</a>
         <a href="#how-it-works">How it works</a>
         <span class="offline-pill" id="network-status" aria-live="polite">On device</span>
       </nav>
     </header>
 
-    <main id="main">
+    <main id="main" tabindex="-1">
       <section class="hero" aria-labelledby="hero-title">
         <picture class="hero-plate">
           <source srcset="/assets/field-station-960.avif 960w, /assets/field-station-1536.avif 1536w" type="image/avif" sizes="100vw" />
@@ -35,13 +52,17 @@
         <div class="hero-shade" aria-hidden="true"></div>
         <div class="hero-copy">
           <p class="eyebrow"><span></span> Private acoustic field kit</p>
-          <h1 id="hero-title">See what a tiny<br />classifier <em>hears.</em></h1>
-          <p class="hero-lede">Collect three sounds, reveal their visible fingerprints, then challenge a simple nearest-neighbor model—without sending a recording anywhere.</p>
-          <a class="button button-primary" href="#field-kit">Open the field kit <span aria-hidden="true">↓</span></a>
+          <h1 id="hero-title">Compare sounds with<br />a tiny <em>classifier.</em></h1>
+          <p class="hero-lede">Students and hobbyists can compare three sounds, see their fingerprints, and test a simple nearest-neighbor model.</p>
+          <div class="hero-actions">
+            <a class="button button-primary" href="/demo">Try it with sample data <span aria-hidden="true">→</span></a>
+            <span>Four ready-made recordings open.</span>
+            <a class="button button-quiet" href="#field-kit">Start with your microphone</a>
+          </div>
           <ul class="trust-row" aria-label="Product qualities">
-            <li><span aria-hidden="true">◎</span> Local only</li>
-            <li><span aria-hidden="true">◇</span> Works offline</li>
-            <li><span aria-hidden="true">≋</span> Explainable</li>
+            <li><span aria-hidden="true">◎</span> Audio stays on this device</li>
+            <li><span aria-hidden="true">◇</span> Works offline after the first visit</li>
+            <li><span aria-hidden="true">≋</span> Free. No account</li>
           </ul>
         </div>
         <p class="hero-caption"><span>01</span> Moonlit traces turn an invisible signal into something you can compare.</p>
@@ -231,7 +252,7 @@
     <footer>
       <div class="footer-brand"><span>Sound Pattern Playground</span><p>A private learning instrument by the Param Factory.</p></div>
       <nav aria-label="Legal"><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a><a href="#how-it-works">Method</a></nav>
-      <p class="art-credit">Environmental scene generated for this product with Azure AI Foundry. No recording leaves your browser.</p>
+      <p class="art-credit">Environmental scene generated for this product with Azure AI Foundry. No recording leaves your browser. <span>v1.1.0</span></p>
     </footer>
 
     <div class="toast" id="update-toast" role="status" hidden><span>A fresh field kit is ready.</span><button type="button" id="reload-app">Reload</button></div>

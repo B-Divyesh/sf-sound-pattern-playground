@@ -9,7 +9,7 @@ test('loads a semantic, accessible field kit without console errors', async ({ p
   await expect(page.locator('html')).toHaveAttribute('lang', 'en');
   await expect(page.locator('main')).toHaveCount(1);
   await expect(page.locator('h1')).toHaveCount(1);
-  await expect(page.getByRole('heading', { level: 1 })).toContainText('See what a tiny');
+  await expect(page.getByRole('heading', { level: 1 })).toContainText('Compare sounds with');
   await expect(page.getByText('No sound under the lens yet')).toBeVisible();
   const results = await new AxeBuilder({ page }).analyze();
   const serious = results.violations.filter((violation) => ['serious', 'critical'].includes(violation.impact ?? ''));
@@ -57,7 +57,7 @@ test('restores the app shell while fully offline', async ({ page, context }) => 
   });
   await context.setOffline(true);
   await page.reload();
-  await expect(page.getByRole('heading', { level: 1 })).toContainText('See what a tiny');
+  await expect(page.getByRole('heading', { level: 1 })).toContainText('Compare sounds with');
   await expect(page.locator('#class-progress .progress-row')).toHaveCount(3);
 });
 
@@ -65,9 +65,42 @@ test('keeps the primary flow usable at 390px', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/');
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
-  await page.getByRole('link', { name: /Open the field kit/i }).click();
+  await page.getByRole('link', { name: /Start with your microphone/i }).click();
   await expect(page.getByRole('heading', { name: 'Name three sounds' })).toBeVisible();
   await expect(page.getByRole('button', { name: /Start listening/i })).toBeVisible();
   const bodyWidth = await page.locator('body').evaluate((body) => body.scrollWidth);
   expect(bodyWidth).toBeLessThanOrEqual(390);
+});
+
+test('keeps demo, legal, and not-found pages accessible', async ({ page }) => {
+  for (const route of ['/demo', '/privacy/', '/terms/', '/404.html']) {
+    await page.goto(route);
+    await expect(page.locator('main')).toHaveCount(1);
+    await expect(page.locator('h1')).toHaveCount(1);
+    await expect(page.locator('a.skip-link')).toHaveCount(1);
+    const results = await new AxeBuilder({ page }).analyze();
+    const serious = results.violations.filter((violation) => ['serious', 'critical'].includes(violation.impact ?? ''));
+    expect(serious, `${route}: ${serious.map((violation) => violation.id).join(', ')}`).toEqual([]);
+  }
+});
+
+test('supports keyboard focus, reduced motion, and 44px legal targets', async ({ page }) => {
+  await page.goto('/demo');
+  await page.keyboard.press('Tab');
+  await expect(page.getByRole('link', { name: 'Skip to playground' })).toBeFocused();
+  await page.keyboard.press('Enter');
+  await expect(page.locator('#main')).toBeFocused();
+
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  const motion = await page.locator('.button').first().evaluate((node) => getComputedStyle(node).transitionDuration);
+  expect(['0.00001s', '1e-05s']).toContain(motion);
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/terms/');
+  for (const link of await page.locator('header nav a, footer a').all()) {
+    const box = await link.boundingBox();
+    expect(box?.width ?? 0).toBeGreaterThanOrEqual(44);
+    expect(box?.height ?? 0).toBeGreaterThanOrEqual(44);
+  }
+  expect(await page.locator('body').evaluate((body) => body.scrollWidth)).toBeLessThanOrEqual(390);
 });

@@ -115,10 +115,11 @@ Generation prompt:
 - Source PNG and prompt sidecar live in `assets/src/`; optimized WebP/AVIF ship
   from `public/assets/` at explicit dimensions. The footer discloses the
   generated scene.
+- `public/assets/social-card.jpg` is a deterministic 1200 × 630 crop of that
+  reviewed source image. It adds no generated text, symbols, or new imagery.
 
 ### Authored UI assets
 
 Wave, microphone, file, and privacy symbols are original inline SVG paths using
 the same rounded instrument-line language. PWA icons are hand-authored SVG
 converted locally to raster: a field microphone above three water ripples.
-
