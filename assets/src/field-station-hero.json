@@ -1,0 +1,8 @@
+{
+  "generator": "Azure AI Foundry via /opt/fleet/lib/gen-image.sh",
+  "deployment": "factory-image",
+  "created": "2026-08-28",
+  "size": "1536x1024",
+  "quality": "high",
+  "prompt": "Use case: stylized-concept. Asset type: wide landing-page hero environmental plate. Scene: a compact acoustic field station on a blackened wood platform beside a still wetland at blue hour. Subject: one small unbranded field microphone aimed across dark water; subtle concentric ripples and thin sea-glass cyan traces make sound visible across the water; mist between reeds; weathered brass knobs and one restrained coral recording lamp. Style: cinematic environmental concept art with tactile realistic materials, quiet and curious rather than futuristic. Composition: 1536 by 1024 landscape, cinematic 35mm lens at low eye level, generous calm negative space on the left for webpage title copy, microphone and field desk primarily on the right third. Lighting: deep peat-black and pine shadows, cream moon haze, cool blue-green moonlight with restrained warm instrument light. Avoid: people, animals as focal subjects, readable text, letters, numbers, watermark, logos, brands, UI screens, cyberpunk neon, generic gradients, anatomical ears, misleading futuristic technology, oversaturated colors."
+}

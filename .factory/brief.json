@@ -1,0 +1,10 @@
+{
+  "slug": "sound-pattern-playground",
+  "title": "Sound Pattern Playground",
+  "artifact_class": "pwa-offline",
+  "user": "Students and hobbyists experimenting with their microphone who need to understand what an on-device sound classifier notices before training or embedding one.",
+  "smallest_useful_product": "Offline PWA that records short user-consented clips, shows waveform/spectrogram/MFCC-like features, collects three labels, runs a transparent in-browser nearest-neighbor baseline, and exports the dataset.",
+  "success_measure": "In a workshop, 80% of participants can collect three classes, explain one visible feature difference, and identify one misclassification in 25 minutes.",
+  "monetization": "free",
+  "constraints": "Never label people or infer sensitive traits; explicit microphone permission; local storage with obvious deletion; illustrative, non-diagnostic features."
+}
