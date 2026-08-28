@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#071311" />
+    <meta name="description" content="Record short sounds, see their features, and teach a tiny private classifier—all on your device." />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+    <link rel="preload" href="/assets/field-station-960.webp" as="image" type="image/webp" fetchpriority="high" />
+    <title>Sound Pattern Playground — See what a tiny classifier hears</title>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to playground</a>
+    <header class="site-header">
+      <a class="brand" href="/" aria-label="Sound Pattern Playground home">
+        <svg aria-hidden="true" viewBox="0 0 40 40"><path d="M20 5v19m-6-13v8a6 6 0 0 0 12 0v-8M10 30c6 3 14 3 20 0M7 35c8 4 18 4 26 0"/></svg>
+        <span>Sound Pattern<br /><em>Playground</em></span>
+      </a>
+      <nav aria-label="Primary">
+        <a href="#field-kit">Field kit</a>
+        <a href="#how-it-works">How it works</a>
+        <span class="offline-pill" id="network-status" aria-live="polite">On device</span>
+      </nav>
+    </header>
+
+    <main id="main">
+      <section class="hero" aria-labelledby="hero-title">
+        <picture class="hero-plate">
+          <source srcset="/assets/field-station-960.avif 960w, /assets/field-station-1536.avif 1536w" type="image/avif" sizes="100vw" />
+          <source srcset="/assets/field-station-960.webp 960w, /assets/field-station-1536.webp 1536w" type="image/webp" sizes="100vw" />
+          <img src="/assets/field-station-960.jpg" width="1536" height="1024" alt="A microphone at a moonlit wetland field station, with turquoise sound ripples crossing the water" decoding="async" fetchpriority="high" />
+        </picture>
+        <div class="hero-shade" aria-hidden="true"></div>
+        <div class="hero-copy">
+          <p class="eyebrow"><span></span> Private acoustic field kit</p>
+          <h1 id="hero-title">See what a tiny<br />classifier <em>hears.</em></h1>
+          <p class="hero-lede">Collect three sounds, reveal their visible fingerprints, then challenge a simple nearest-neighbor model—without sending a recording anywhere.</p>
+          <a class="button button-primary" href="#field-kit">Open the field kit <span aria-hidden="true">↓</span></a>
+          <ul class="trust-row" aria-label="Product qualities">
+            <li><span aria-hidden="true">◎</span> Local only</li>
+            <li><span aria-hidden="true">◇</span> Works offline</li>
+            <li><span aria-hidden="true">≋</span> Explainable</li>
+          </ul>
+        </div>
+        <p class="hero-caption"><span>01</span> Moonlit traces turn an invisible signal into something you can compare.</p>
+      </section>
+
+      <section class="field-kit section-shell" id="field-kit" aria-labelledby="kit-title">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow"><span></span> Your local experiment</p>
+            <h2 id="kit-title">The field kit</h2>
+          </div>
+          <p>Make each sound a few times. The model only compares the examples you give it.</p>
+        </div>
+
+        <div class="setup-strip" aria-labelledby="labels-title">
+          <div class="setup-intro">
+            <span class="step-number">01</span>
+            <div>
+              <h3 id="labels-title">Name three sounds</h3>
+              <p>Choose actions or objects—not people or traits.</p>
+            </div>
+          </div>
+          <div class="label-fields">
+            <label><span>Sound A</span><input id="label-0" maxlength="24" value="Tap" autocomplete="off" /></label>
+            <label><span>Sound B</span><input id="label-1" maxlength="24" value="Hum" autocomplete="off" /></label>
+            <label><span>Sound C</span><input id="label-2" maxlength="24" value="Clap" autocomplete="off" /></label>
+          </div>
+          <p class="field-error" id="labels-error" role="alert"></p>
+        </div>
+
+        <div class="lab-grid">
+          <section class="capture-console" aria-labelledby="capture-title">
+            <div class="console-head">
+              <span class="step-number">02</span>
+              <div>
+                <h3 id="capture-title">Listen & collect</h3>
+                <p id="capture-guidance">Select a label, then record a 1–4 second example.</p>
+              </div>
+            </div>
+
+            <div class="mode-tabs" id="mode-tabs" role="group" aria-label="Recording purpose">
+              <button type="button" class="mode-tab is-active" data-mode="label" data-index="0" aria-pressed="true"><span>Tap</span><small>0 clips</small></button>
+              <button type="button" class="mode-tab" data-mode="label" data-index="1" aria-pressed="false"><span>Hum</span><small>0 clips</small></button>
+              <button type="button" class="mode-tab" data-mode="label" data-index="2" aria-pressed="false"><span>Clap</span><small>0 clips</small></button>
+              <button type="button" class="mode-tab mystery-tab" data-mode="mystery" aria-pressed="false"><span>?</span><small>Test sound</small></button>
+            </div>
+
+            <div class="monitor" id="monitor">
+              <div class="monitor-meta">
+                <span class="record-state"><i aria-hidden="true"></i><b id="record-state">Ready to listen</b></span>
+                <span class="timer" id="timer">00:00.0</span>
+              </div>
+              <canvas id="live-canvas" width="680" height="180" aria-label="Live microphone waveform"></canvas>
+              <p class="chart-fallback" id="live-description">The live waveform will appear here while the microphone is listening.</p>
+              <div class="monitor-baseline" aria-hidden="true"><span>Quiet</span><span>Loud</span></div>
+            </div>
+
+            <label class="consent-line" for="mic-consent">
+              <input type="checkbox" id="mic-consent" />
+              <span>I’m ready to use this device’s microphone. Audio stays in this browser.</span>
+            </label>
+            <div class="record-actions">
+              <button type="button" class="record-button" id="record-button">
+                <span class="record-icon" aria-hidden="true"><i></i></span>
+                <span><b>Start listening</b><small>Up to 4 seconds</small></span>
+              </button>
+              <button type="button" class="button button-quiet" id="stop-button" disabled>Stop & keep clip</button>
+            </div>
+            <p class="status-message" id="status-message" role="status" aria-live="polite">No microphone permission requested yet.</p>
+          </section>
+
+          <aside class="progress-panel" aria-labelledby="progress-title">
+            <div class="console-head compact">
+              <span class="step-number">03</span>
+              <div>
+                <h3 id="progress-title">Build the pattern set</h3>
+                <p>Three examples per sound gives the baseline more to compare.</p>
+              </div>
+            </div>
+            <div id="class-progress" class="class-progress"></div>
+            <div class="readiness" id="readiness">
+              <span aria-hidden="true">○</span>
+              <p><b>Classifier is waiting</b><br /><small>Record at least one example for every sound.</small></p>
+            </div>
+            <div class="ethics-note">
+              <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 3 5 6v5c0 4.8 2.9 8.2 7 10 4.1-1.8 7-5.2 7-10V6l-7-3Zm0 4v10m-3-6 3-4 3 4"/></svg>
+              <p><b>Teach sounds, not identities.</b> This tiny model is illustrative, not diagnostic. Don’t use it to infer emotions, health, safety, or traits.</p>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="analysis-section section-shell" id="analysis" aria-labelledby="analysis-title">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow"><span></span> Visible evidence</p>
+            <h2 id="analysis-title">Inspect a sound</h2>
+          </div>
+          <p id="analysis-summary">Record or select a specimen to see the evidence the baseline compares.</p>
+        </div>
+        <div class="empty-analysis" id="empty-analysis">
+          <div class="empty-ripple" aria-hidden="true"><i></i><i></i><i></i></div>
+          <h3>No sound under the lens yet</h3>
+          <p>Your first recording will reveal a waveform, frequency trail, and MFCC-like shape.</p>
+          <a href="#capture-title">Record a first sound</a>
+        </div>
+        <div class="feature-workbench" id="feature-workbench" hidden>
+          <div class="selected-specimen">
+            <div><span class="specimen-tag" id="selected-tag">Sound</span><h3 id="selected-title">Selected specimen</h3><p id="selected-meta"></p></div>
+            <audio id="selected-audio" controls preload="metadata"></audio>
+          </div>
+          <div class="feature-grid">
+            <figure>
+              <figcaption><span>01</span><div><b>Waveform</b><small>How air pressure changed over time</small></div></figcaption>
+              <canvas id="waveform-canvas" width="720" height="260" aria-label="Waveform of the selected recording"></canvas>
+              <p id="waveform-description" class="chart-description"></p>
+            </figure>
+            <figure>
+              <figcaption><span>02</span><div><b>Frequency trail</b><small>Low pitches below, time moves right</small></div></figcaption>
+              <canvas id="spectrogram-canvas" width="720" height="260" aria-label="Frequency trail of the selected recording"></canvas>
+              <p id="spectrogram-description" class="chart-description"></p>
+            </figure>
+            <figure>
+              <figcaption><span>03</span><div><b>MFCC-like shape</b><small>A compact summary of spectral texture</small></div></figcaption>
+              <canvas id="mfcc-canvas" width="720" height="260" aria-label="MFCC-like feature bars for the selected recording"></canvas>
+              <p id="mfcc-description" class="chart-description"></p>
+            </figure>
+          </div>
+          <div class="observation" id="observation"><span>Notice</span><p></p></div>
+        </div>
+      </section>
+
+      <section class="classifier-section section-shell" id="classifier" aria-labelledby="classifier-title">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow"><span></span> Transparent baseline</p>
+            <h2 id="classifier-title">Follow the classifier’s guess</h2>
+          </div>
+          <p>It finds the three stored examples with the most similar spectral fingerprints. Nearest votes win.</p>
+        </div>
+        <div class="classifier-empty" id="classifier-empty">
+          <span class="large-question" aria-hidden="true">?</span>
+          <div><h3>Ready for a mystery sound?</h3><p>Collect one example for each label, select <b>Test sound</b>, then record something new.</p></div>
+          <button class="button button-secondary" type="button" id="choose-mystery">Choose test mode</button>
+        </div>
+        <div class="classifier-result" id="classifier-result" hidden>
+          <div class="guess-panel">
+            <p>The baseline’s guess</p><h3 id="guess-label">—</h3><p id="guess-explanation"></p>
+            <div class="vote-meter" id="vote-meter" aria-label="Neighbor votes"></div>
+            <button class="button button-quiet" id="mark-misclassification" type="button">Mark as a misclassification</button>
+            <p class="misclassification-note" id="misclassification-note" aria-live="polite"></p>
+          </div>
+          <div class="neighbors-panel"><h3>Nearest examples</h3><div id="neighbor-list"></div><p class="distance-key">Shorter distance means a more similar stored feature shape. It is not probability.</p></div>
+        </div>
+      </section>
+
+      <section class="specimens-section section-shell" aria-labelledby="specimens-title">
+        <div class="section-heading specimen-heading">
+          <div><p class="eyebrow"><span></span> Local collection</p><h2 id="specimens-title">Your specimens</h2></div>
+          <p id="sample-total">0 recordings on this device</p>
+        </div>
+        <div class="specimen-list" id="specimen-list"></div>
+        <div class="data-tools">
+          <div><h3>Take your work with you</h3><p>JSON includes recordings and can be imported later. CSV contains the visible features for a spreadsheet.</p></div>
+          <div class="tool-actions">
+            <button class="button button-secondary" id="export-json" type="button">Export dataset</button>
+            <button class="button button-quiet" id="export-csv" type="button">Export features CSV</button>
+            <label class="button button-quiet import-button">Import dataset<input id="import-json" type="file" accept="application/json,.json" /></label>
+            <button class="button button-danger" id="erase-all" type="button">Erase all local data</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="method-section" id="how-it-works" aria-labelledby="method-title">
+        <div class="section-shell method-inner">
+          <div><p class="eyebrow"><span></span> No black box</p><h2 id="method-title">What happens<br />under the surface</h2><p>The playground deliberately uses a small, fallible method. The point is to inspect where it works—and catch where it doesn’t.</p></div>
+          <ol class="method-steps">
+            <li><span>01</span><div><h3>Listen</h3><p>Your browser captures at most four seconds after you explicitly allow the microphone.</p></div></li>
+            <li><span>02</span><div><h3>Summarize</h3><p>Web Audio turns the clip into loudness, frequency bands, and an MFCC-like cosine summary.</p></div></li>
+            <li><span>03</span><div><h3>Compare</h3><p>A nearest-neighbor baseline measures Euclidean distance between normalized spectral fingerprints.</p></div></li>
+            <li><span>04</span><div><h3>Question</h3><p>You inspect every neighbor and mark wrong guesses. No hidden training and no cloud model.</p></div></li>
+          </ol>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="footer-brand"><span>Sound Pattern Playground</span><p>A private learning instrument by the Param Factory.</p></div>
+      <nav aria-label="Legal"><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a><a href="#how-it-works">Method</a></nav>
+      <p class="art-credit">Environmental scene generated for this product with Azure AI Foundry. No recording leaves your browser.</p>
+    </footer>
+
+    <div class="toast" id="update-toast" role="status" hidden><span>A fresh field kit is ready.</span><button type="button" id="reload-app">Reload</button></div>
+
+    <dialog id="erase-dialog" aria-labelledby="erase-title">
+      <form method="dialog">
+        <h2 id="erase-title">Erase every local recording?</h2>
+        <p>This will permanently remove all clips, features, and label names stored by this playground on this device.</p>
+        <div class="dialog-actions"><button class="button button-quiet" value="cancel">Keep my data</button><button class="button button-danger" id="confirm-erase" value="confirm">Erase everything</button></div>
+      </form>
+    </dialog>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

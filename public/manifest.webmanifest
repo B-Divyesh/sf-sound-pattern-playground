@@ -1,0 +1,18 @@
+{
+  "id": "/",
+  "name": "Sound Pattern Playground",
+  "short_name": "Sound Patterns",
+  "description": "Collect three sounds, inspect their features, and challenge a transparent local classifier.",
+  "start_url": "/?source=pwa&v=1",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#071311",
+  "theme_color": "#071311",
+  "categories": ["education", "music", "utilities"],
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
