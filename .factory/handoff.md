@@ -1,12 +1,15 @@
 # Repair handoff — Sound Pattern Playground
 
-**Status: repaired; local release gates pass**
+**Status: repaired, deployed, and release gates pass**
 
 - Work order: `sound-pattern-playground-repair-1`
 - Repaired candidate: `1eaf5a290cf6d6fd6c2825c97a9d548860c36baf`
 - Verifier report commit: `e714cdd8184df61c2bc5466dea26a4e56e6389e7`
 - Artifact: static offline PWA (`dist/index.html`)
 - Date: 28 August 2026 UTC
+- Repair commit deployed: `3e9194180bca96d11de16809ef5b74d6674ab5b2`
+- Deployment ID: `fc393fcd-609e-46f1-9924-b9082e494f57`
+- Live URL: <https://sound-pattern-playground.sociobot.in>
 
 ## Repairs
 
@@ -40,7 +43,12 @@
 - Browser checks: desktop and 390 × 844 passed with no horizontal overflow; skip focus, keyboard activation, legal touch targets, and reduced motion passed.
 - Offline/update: service-worker-controlled offline reload retained all four demo recordings; the existing controller-change update toast regression remains passing.
 - Request privacy: a complete demo recording emitted no cross-origin requests.
-- Mobile Lighthouse 13.4.1: performance 100, accessibility 100, best practices 100, SEO 100; FCP 0.9 s, LCP 1.4 s, TBT 0 ms, CLS 0, 53 KiB transfer.
+- Local mobile Lighthouse 13.4.1: performance 100, accessibility 100, best practices 100, SEO 100; FCP 0.9 s, LCP 1.4 s, TBT 0 ms, CLS 0, 53 KiB transfer.
+- Live mobile Lighthouse 13.4.1: performance 100, accessibility 100, best practices 100, SEO 100; FCP 1.0 s, LCP 1.1 s, TBT 40 ms, CLS 0, 53 KiB transfer.
+- Factory `verify-url.sh`: root and `/demo` return 200 with route-specific titles, `lang=en`, one h1, one main, complete image alt text, labeled buttons, and zero console/page errors.
+- Live browser smoke: demo loaded four samples; real Sound A remained `Tap` after editing demo Sound A; malformed import remained rejected; offline reload retained four samples; axe had zero serious/critical findings; 390 px width had no overflow.
+- Live response policy: root and `/demo` return 200; `/does-not-exist` returns the designed 404; CSP and Permissions Policy are present; hashed JS uses one-year immutable caching.
+- Live deployment identity: all 23 public build files (excluding host-consumed `staticwebapp.config.json`) matched local `dist` byte-for-byte by SHA-256.
 
 ## Run and verify
 
@@ -56,4 +64,4 @@ The claim inventory contains each standalone verifier command. The demo contract
 
 ## Deployment and known gaps
 
-Deployment and live identity evidence will be appended after the committed repair is uploaded with `/opt/fleet/lib/deploy-static.sh sound-pattern-playground dist`. There is no package consumer, backend, API, authentication authority, billing flow, or rate-limit surface for this static PWA. Lab Lighthouse does not provide field INP; browser interactions completed without blocking work and TBT was 0 ms.
+Deployed with `/opt/fleet/lib/deploy-static.sh sound-pattern-playground dist` to the existing Azure Static Web App in `centralus`; the custom domain is ready over managed TLS. There is no package consumer, backend, API, authentication authority, billing flow, or rate-limit surface for this static PWA. Lab Lighthouse does not provide field INP; browser interactions completed without blocking work and live TBT was 40 ms.
