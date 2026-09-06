@@ -1,6 +1,6 @@
 # Landing-page copy audit
 
-Audited 28 August 2026. Counts treat hyphenated terms as one word. The page has no sentence over 22 words and uses none of the banned marketing terms.
+Audited 6 September 2026. Counts treat hyphenated terms as one word. The page has no sentence over 22 words and uses none of the banned marketing terms, metaphors, slogans, or mood headings.
 
 | Sentence | Words | Flag |
 | --- | ---: | --- |
@@ -11,7 +11,6 @@ Audited 28 August 2026. Counts treat hyphenated terms as one word. The page has 
 | Works offline after the first visit. | 6 | None |
 | Free. | 1 | None |
 | No account. | 2 | None |
-| Moonlit traces turn an invisible signal into something you can compare. | 11 | None |
 | Make each sound a few times. | 6 | None |
 | The model only compares the examples you give it. | 9 | None |
 | Choose actions or objects—not people or traits. | 8 | None |
@@ -33,17 +32,17 @@ Audited 28 August 2026. Counts treat hyphenated terms as one word. The page has 
 | It is not probability. | 4 | None |
 | JSON includes recordings and can be imported later. | 8 | None |
 | CSV contains the visible features for a spreadsheet. | 8 | None |
-| The playground deliberately uses a small, fallible method. | 8 | None |
-| The point is to inspect where it works—and catch where it doesn’t. | 13 | None |
+| The playground uses a small, fallible method. | 7 | None |
+| Inspect where it works and catch where it does not. | 10 | None |
 | Your browser captures at most four seconds after you explicitly allow the microphone. | 13 | None |
 | Web Audio turns the clip into loudness, frequency bands, and an MFCC-like cosine summary. | 14 | None |
 | A nearest-neighbor baseline measures Euclidean distance between normalized spectral fingerprints. | 10 | None |
 | You inspect every neighbor and mark wrong guesses. | 8 | None |
 | No hidden training and no cloud model. | 7 | None |
-| A private learning instrument by the Param Factory. | 8 | None |
+| Free local sound-learning software by the Param Factory. | 8 | None |
 | Environmental scene generated for this product with Azure AI Foundry. | 10 | None |
 | No recording leaves your browser. | 5 | None |
-| A fresh field kit is ready. | 6 | None |
+| An update is ready. | 4 | None |
 | This will permanently remove all clips, features, and label names stored by this playground on this device. | 17 | None |
 
 ## Terminology

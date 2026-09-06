@@ -1,6 +1,7 @@
-const CACHE = 'sound-field-kit-v3';
+const CACHE = 'sound-field-kit-v4';
 const CORE = [
   '/', '/demo',
+  '/route-mode.js',
   '/assets/field-station-960.webp', '/assets/field-station-960.avif', '/assets/field-station-960.jpg',
   '/assets/field-station-1536.webp', '/assets/field-station-1536.avif', '/assets/social-card.jpg',
   '/icon.svg', '/icons/icon-192.png', '/icons/icon-512.png', '/icons/apple-touch-icon.png',

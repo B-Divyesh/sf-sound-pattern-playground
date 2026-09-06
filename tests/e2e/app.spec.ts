@@ -17,6 +17,27 @@ test('loads a semantic, accessible field kit without console errors', async ({ p
   expect(consoleErrors).toEqual([]);
 });
 
+test('shows the demo shell before app initialization and keeps layout shifts below the mobile budget', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.addInitScript(() => {
+    const shifts: number[] = [];
+    new PerformanceObserver((entries) => {
+      for (const entry of entries.getEntries() as PerformanceEntryList & Array<PerformanceEntry & { hadRecentInput?: boolean; value?: number }>) {
+        if (!entry.hadRecentInput && entry.value) shifts.push(entry.value);
+      }
+    }).observe({ type: 'layout-shift', buffered: true });
+    (window as Window & { demoLayoutShifts?: number[] }).demoLayoutShifts = shifts;
+  });
+  await page.route(/\/assets\/[^/]+\.js$/, (route) => route.abort());
+  await page.goto('/demo', { waitUntil: 'domcontentloaded' });
+  await expect(page.getByLabel('Demo mode')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Reset demo' })).toBeVisible();
+  await expect(page.locator('.site-header')).toHaveCSS('top', '104px');
+  await page.waitForTimeout(250);
+  const cls = await page.evaluate(() => (window as Window & { demoLayoutShifts?: number[] }).demoLayoutShifts?.reduce((sum, value) => sum + value, 0) ?? 0);
+  expect(cls).toBeLessThan(0.01);
+});
+
 test('records three labels, classifies a test sound, and exports features', async ({ page }) => {
   await page.goto('/');
   await page.getByLabel(/ready to use this device/i).check();

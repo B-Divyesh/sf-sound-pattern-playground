@@ -21,6 +21,7 @@
     <link rel="manifest" href="/manifest.webmanifest" />
     <link rel="icon" href="/icon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+    <script src="/route-mode.js"></script>
     <title>Sound Pattern Playground — Compare sound patterns</title>
   </head>
   <body>
@@ -36,7 +37,7 @@
       </a>
       <nav aria-label="Primary">
         <a href="/demo">Demo</a>
-        <a href="#field-kit">Field kit</a>
+        <a href="#field-kit">Playground</a>
         <a href="#how-it-works">How it works</a>
         <span class="offline-pill" id="network-status" aria-live="polite">On device</span>
       </nav>
@@ -51,7 +52,7 @@
         </picture>
         <div class="hero-shade" aria-hidden="true"></div>
         <div class="hero-copy">
-          <p class="eyebrow"><span></span> Private acoustic field kit</p>
+          <p class="eyebrow"><span></span> Local sound classifier</p>
           <h1 id="hero-title">Compare sounds with<br />a tiny <em>classifier.</em></h1>
           <p class="hero-lede">Students and hobbyists can compare three sounds, see their fingerprints, and test a simple nearest-neighbor model.</p>
           <div class="hero-actions">
@@ -65,14 +66,13 @@
             <li><span aria-hidden="true">≋</span> Free. No account</li>
           </ul>
         </div>
-        <p class="hero-caption"><span>01</span> Moonlit traces turn an invisible signal into something you can compare.</p>
       </section>
 
       <section class="field-kit section-shell" id="field-kit" aria-labelledby="kit-title">
         <div class="section-heading">
           <div>
-            <p class="eyebrow"><span></span> Your local experiment</p>
-            <h2 id="kit-title">The field kit</h2>
+            <p class="eyebrow"><span></span> On this device</p>
+            <h2 id="kit-title">Record and label sounds</h2>
           </div>
           <p>Make each sound a few times. The model only compares the examples you give it.</p>
         </div>
@@ -158,7 +158,7 @@
       <section class="analysis-section section-shell" id="analysis" aria-labelledby="analysis-title">
         <div class="section-heading">
           <div>
-            <p class="eyebrow"><span></span> Visible evidence</p>
+            <p class="eyebrow"><span></span> Sound features</p>
             <h2 id="analysis-title">Inspect a sound</h2>
           </div>
           <p id="analysis-summary">Record or select a specimen to see the evidence the baseline compares.</p>
@@ -198,7 +198,7 @@
       <section class="classifier-section section-shell" id="classifier" aria-labelledby="classifier-title">
         <div class="section-heading">
           <div>
-            <p class="eyebrow"><span></span> Transparent baseline</p>
+            <p class="eyebrow"><span></span> How the guess works</p>
             <h2 id="classifier-title">Follow the classifier’s guess</h2>
           </div>
           <p>It finds the three stored examples with the most similar spectral fingerprints. Nearest votes win.</p>
@@ -221,7 +221,7 @@
 
       <section class="specimens-section section-shell" aria-labelledby="specimens-title">
         <div class="section-heading specimen-heading">
-          <div><p class="eyebrow"><span></span> Local collection</p><h2 id="specimens-title">Your specimens</h2></div>
+          <div><p class="eyebrow"><span></span> On this device</p><h2 id="specimens-title">Saved recordings</h2></div>
           <p id="sample-total">0 recordings on this device</p>
         </div>
         <div class="specimen-list" id="specimen-list"></div>
@@ -238,7 +238,7 @@
 
       <section class="method-section" id="how-it-works" aria-labelledby="method-title">
         <div class="section-shell method-inner">
-          <div><p class="eyebrow"><span></span> No black box</p><h2 id="method-title">What happens<br />under the surface</h2><p>The playground deliberately uses a small, fallible method. The point is to inspect where it works—and catch where it doesn’t.</p></div>
+          <div><p class="eyebrow"><span></span> How it works</p><h2 id="method-title">How the classifier<br />compares sounds</h2><p>The playground uses a small, fallible method. Inspect where it works and catch where it does not.</p></div>
           <ol class="method-steps">
             <li><span>01</span><div><h3>Listen</h3><p>Your browser captures at most four seconds after you explicitly allow the microphone.</p></div></li>
             <li><span>02</span><div><h3>Summarize</h3><p>Web Audio turns the clip into loudness, frequency bands, and an MFCC-like cosine summary.</p></div></li>
@@ -250,12 +250,12 @@
     </main>
 
     <footer>
-      <div class="footer-brand"><span>Sound Pattern Playground</span><p>A private learning instrument by the Param Factory.</p></div>
+      <div class="footer-brand"><span>Sound Pattern Playground</span><p>Free local sound-learning software by the Param Factory.</p></div>
       <nav aria-label="Legal"><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a><a href="#how-it-works">Method</a></nav>
       <p class="art-credit">Environmental scene generated for this product with Azure AI Foundry. No recording leaves your browser. <span>v1.1.0</span></p>
     </footer>
 
-    <div class="toast" id="update-toast" role="status" hidden><span>A fresh field kit is ready.</span><button type="button" id="reload-app">Reload</button></div>
+      <div class="toast" id="update-toast" role="status" hidden><span>An update is ready.</span><button type="button" id="reload-app">Reload</button></div>
 
     <dialog id="erase-dialog" aria-labelledby="erase-title">
       <form method="dialog">

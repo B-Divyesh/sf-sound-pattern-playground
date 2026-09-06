@@ -45,7 +45,8 @@ img, canvas { display: block; max-width: 100%; }
 .demo-banner > div { display: flex; gap: 8px; }
 .demo-banner button { min-width: 44px; min-height: 44px; padding: 8px 14px; border: 1px solid rgba(36, 25, 5, .5); border-radius: 4px; background: transparent; color: #241905; cursor: pointer; font-weight: 800; }
 .demo-banner #start-real { background: #241905; color: var(--paper); }
-.demo-mode .site-header { top: 52px; }
+html.demo-mode .demo-banner[hidden] { display: flex !important; }
+html.demo-mode .site-header, .demo-mode .site-header { top: 52px; }
 
 .site-header { position: absolute; inset: 0 0 auto; z-index: 10; height: 92px; padding: 0 max(24px, calc((100vw - 1180px) / 2)); display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(244, 240, 223, .2); }
 .brand { min-height: 52px; display: flex; align-items: center; gap: 11px; color: var(--paper); text-decoration: none; font-size: 12px; font-weight: 700; line-height: 1.05; letter-spacing: .04em; text-transform: uppercase; }
@@ -82,8 +83,6 @@ img, canvas { display: block; max-width: 100%; }
 .trust-row { display: flex; gap: 25px; margin: 28px 0 0; padding: 0; list-style: none; color: var(--mist); font-size: 13px; font-weight: 650; }
 .trust-row li { display: flex; gap: 7px; align-items: center; }
 .trust-row span { color: var(--signal); font-size: 17px; }
-.hero-caption { position: absolute; z-index: 2; right: max(24px, calc((100vw - 1180px) / 2)); bottom: 34px; width: 340px; display: flex; gap: 16px; color: var(--mist); font-size: 12px; line-height: 1.45; }
-.hero-caption span { color: var(--signal); font-variant-numeric: tabular-nums; }
 
 .section-shell { width: min(1180px, calc(100% - 48px)); margin-inline: auto; }
 .field-kit, .analysis-section, .classifier-section, .specimens-section { padding-block: 96px; }
@@ -266,7 +265,7 @@ dialog p { color: var(--mist); }
   .demo-banner { align-items: flex-start; flex-direction: column; gap: 4px; padding-block: 8px; }
   .demo-banner > div { width: 100%; }
   .demo-banner button { flex: 1; }
-  .demo-mode .site-header { top: 104px; }
+  html.demo-mode .site-header, .demo-mode .site-header { top: 104px; }
   .site-header { height: 76px; padding-inline: 16px; }
   .brand svg { width: 34px; }
   .offline-pill { padding-inline: 9px; }
@@ -280,7 +279,6 @@ dialog p { color: var(--mist); }
   .hero-actions .button { width: 100%; }
   .hero-actions > span { max-width: none; }
   .trust-row { gap: 12px; flex-wrap: wrap; }
-  .hero-caption { display: none; }
   .section-shell { width: calc(100% - 32px); }
   .field-kit, .analysis-section, .classifier-section, .specimens-section { padding-block: 68px; }
   .section-heading { align-items: start; flex-direction: column; margin-bottom: 32px; gap: 14px; }

@@ -1,6 +1,6 @@
 # Sound Pattern Playground
 
-Sound Pattern Playground is a private, offline-capable learning instrument for
+Sound Pattern Playground is a private, offline-capable learning tool for
 students and hobbyists who want to understand what a small sound classifier
 notices. Record short examples for three labels, inspect waveform,
 frequency-trail, and MFCC-like summaries, then challenge a transparent

@@ -56,6 +56,8 @@ const state: {
 };
 
 const audioUrls = new Map<string, string>();
+let featureRenderVersion = 0;
+let specimenRenderVersion = 0;
 
 const liveCanvas = element<HTMLCanvasElement>('live-canvas');
 const recordButton = element<HTMLButtonElement>('record-button');
@@ -147,13 +149,18 @@ function renderSpecimens(): void {
       <button class="icon-button delete-specimen" type="button" aria-label="Delete ${escapeHtml(sampleTitle(sample))} recording"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3m-8 0 1 13h8l1-13M10 11v5m4-5v5"/></svg></button>
     </article>`;
   }).join('');
+  const renderVersion = ++specimenRenderVersion;
+  const canvasTasks: Array<() => void> = [];
   list.querySelectorAll<HTMLElement>('.specimen-item').forEach((item) => {
     const sample = state.samples.find((entry) => entry.id === item.dataset.id);
     const canvas = item.querySelector<HTMLCanvasElement>('canvas');
-    if (sample && canvas) drawTinyWaveform(canvas, sample.waveform);
+    if (sample && canvas) canvasTasks.push(() => {
+      if (renderVersion === specimenRenderVersion && canvas.isConnected) drawTinyWaveform(canvas, sample.waveform);
+    });
     item.querySelector('.select-specimen')?.addEventListener('click', () => sample && selectSample(sample.id, true));
     item.querySelector('.delete-specimen')?.addEventListener('click', () => sample && deleteOneSample(sample));
   });
+  scheduleCanvasTasks(canvasTasks);
 }
 
 function audioUrl(sample: SoundSample): string {
@@ -164,7 +171,25 @@ function audioUrl(sample: SoundSample): string {
   return url;
 }
 
-function selectSample(id: string, scroll = false): void {
+function scheduleCanvasTasks(tasks: Array<() => void>): void {
+  const runNext = (): void => {
+    const task = tasks.shift();
+    if (!task) return;
+    task();
+    if (tasks.length > 0) scheduleIdleTask(runNext);
+  };
+  if (tasks.length > 0) scheduleIdleTask(runNext);
+}
+
+function scheduleIdleTask(task: () => void): void {
+  const idleWindow = window as Window & typeof globalThis & {
+    requestIdleCallback?: (callback: () => void, options?: { timeout: number }) => number;
+  };
+  if (idleWindow.requestIdleCallback) idleWindow.requestIdleCallback(task, { timeout: 800 });
+  else window.setTimeout(task, 0);
+}
+
+function selectSample(id: string, scroll = false, refreshLinkedViews = true): void {
   const sample = state.samples.find((entry) => entry.id === id);
   if (!sample) return;
   state.selectedId = sample.id;
@@ -182,13 +207,16 @@ function selectSample(id: string, scroll = false): void {
   element('spectrogram-description').textContent = descriptions.spectrogram;
   element('mfcc-description').textContent = descriptions.mfcc;
   element('observation').querySelector('p')!.textContent = observationFor(sample);
-  requestAnimationFrame(() => {
-    drawWaveform(element<HTMLCanvasElement>('waveform-canvas'), sample.waveform);
-    drawSpectrogram(element<HTMLCanvasElement>('spectrogram-canvas'), sample.trail);
-    drawMfcc(element<HTMLCanvasElement>('mfcc-canvas'), sample.mfcc);
-  });
-  renderClassifier(sample);
-  renderSpecimens();
+  const renderVersion = ++featureRenderVersion;
+  scheduleCanvasTasks([
+    () => { if (renderVersion === featureRenderVersion) drawWaveform(element<HTMLCanvasElement>('waveform-canvas'), sample.waveform); },
+    () => { if (renderVersion === featureRenderVersion) drawSpectrogram(element<HTMLCanvasElement>('spectrogram-canvas'), sample.trail); },
+    () => { if (renderVersion === featureRenderVersion) drawMfcc(element<HTMLCanvasElement>('mfcc-canvas'), sample.mfcc); },
+  ]);
+  if (refreshLinkedViews) {
+    renderClassifier(sample);
+    renderSpecimens();
+  }
   if (scroll) element('analysis').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
@@ -397,7 +425,7 @@ async function finishRecording(mimeType: string): Promise<void> {
     recordState.textContent = 'Saved on this device';
     setStatus(label ? `Saved a “${label}” example on this device.` : `Test complete. The baseline guessed “${classification?.label ?? 'unknown'}.”`, 'success');
     renderAll();
-    selectSample(sample.id, true);
+    selectSample(sample.id, true, false);
   } catch {
     recordState.textContent = 'Could not save';
     setStatus('The browser could not store this clip. Free some site storage or leave private browsing, then try again.', 'error');
@@ -506,7 +534,7 @@ async function resetDemo(): Promise<void> {
   state.activeIndex = 0;
   state.mysteryMode = false;
   renderAll();
-  if (state.selectedId) selectSample(state.selectedId);
+  if (state.selectedId) selectSample(state.selectedId, false, false);
   setStatus('Demo reset to four sample recordings.', 'success');
 }
 
@@ -635,11 +663,14 @@ async function initialize(): Promise<void> {
     const samples = rawSamples.filter(isStoredSample);
     if (labels && validLabels(labels)) state.labels = labels;
     state.samples = samples;
-    renderAll();
     if (samples.length > 0) {
       const latest = [...samples].sort((left, right) => right.createdAt.localeCompare(left.createdAt))[0];
-      selectSample(latest.id);
+      state.selectedId = latest.id;
+      renderAll();
+      selectSample(latest.id, false, false);
       setStatus(DEMO_MODE ? 'Loaded four sample recordings in the demo sandbox.' : `Restored ${samples.length} local ${samples.length === 1 ? 'recording' : 'recordings'}.`, 'success');
+    } else {
+      renderAll();
     }
   } catch {
     renderAll();
