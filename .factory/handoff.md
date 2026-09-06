@@ -51,7 +51,7 @@ npm run build
 - `npm test`: pass; 10 Vitest assertions and 23 Playwright checks.
 - `npm run typecheck` and `npm run build`: pass; `dist/` created.
 - Every exact command in `.factory/claims.json`: pass individually (15/15).
-- Built initial JavaScript is 30.78 KB raw / 11.32 KB gzip; CSS is 22.41 KB
+- Built initial JavaScript is 30.78 KB raw / 11.32 KB gzip; CSS is 22.13 KB
   raw / 5.74 KB gzip.
 
 Fresh live checks after deployment:
@@ -75,7 +75,7 @@ Fresh live checks after deployment:
 | Route | Performance | Accessibility | CLS | TBT | LCP |
 | --- | ---: | ---: | ---: | ---: |
 | `/` | 100 | 100 | 0 | 0 ms | 1.54 s |
-| `/demo` | 99 | 100 | 0 | 5 ms | 1.57 s |
+| `/demo` | 99 | 100 | 0 | 120 ms | 1.53 s |
 
 ## Earlier findings
 
