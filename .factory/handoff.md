@@ -1,44 +1,35 @@
-# Handoff — Sound Pattern Playground
+# Handoff — Sound Pattern Playground verification 3
 
-**Status: PASS**
+**Status: FAIL**
 
-- Work order: `sound-pattern-playground-repair-2`
-- Implementation SHA: `23081d4190831adf6c25309c11238acf8a181113`
-- Previous verification report SHA: `6e7c2cad30272fab6c79b449d5631334fdaa3c9b`
+- Work order: `sound-pattern-playground-verify-3`
+- Implementation reviewed: `23081d4190831adf6c25309c11238acf8a181113`
+- Documentation base: `75d70fe7de9c992d351d1194e14bff1675f2f19b`
 - Live URL: <https://sound-pattern-playground.sociobot.in>
-- Artifact: static offline PWA
-- Verified: 6 September 2026 UTC
+- Full report: [`.factory/verification-3.md`](verification-3.md)
+- Findings: 5
+- Untested public claims: 1
 
-## Job, audience, and first action
+## Result
 
-The product helps students and hobbyists compare three sounds, inspect the
-features a small classifier uses, and check its nearest-neighbor guess. On the
-first screen, choose **Try it with sample data**; four ready-made recordings
-open in the isolated demo.
+The repaired mobile demo performance passes: fresh Lighthouse mobile scores
+100 on `/` and 97 on `/demo`, with CLS 0 and accessibility 100 on both. All 15
+declared claim commands pass in the configured Chromium sandbox. `npm test`
+passes 10 unit assertions and 23 browser checks; typecheck and build pass. All
+24 host-served build files match the live deployment byte for byte.
 
-## Repair
+Release still fails. Fresh WebKit 26 cannot seed the demo audio in IndexedDB.
+`/demo` remains at zero recordings, reports unavailable local storage, and
+cannot recover through Reset. The README names current Safari as supported,
+but that public compatibility claim is absent from `.factory/claims.json`, and
+the declared browser suite runs only Desktop Chrome.
 
-The `/demo` banner previously appeared only after the application module ran.
-On a throttled phone this inserted layout above the hero and caused the
-reported 0.13 CLS.
+Other findings cover the offline fallback’s missing accessibility and plain
+recovery structure, sub-44-pixel links on root/demo, metaphorical and
+inconsistent product terms, and incomplete standard footers on legal/404
+routes. Product code was not changed by this verification.
 
-- `route-mode.js` now marks the demo URL in the document head before body
-  layout. CSS shows the demo banner and reserves the matching header position
-  from the first paint.
-- The demo’s canvas work is scheduled one idle task at a time, and initial
-  rendering no longer duplicates the specimen/feature views. The demo is
-  populated immediately; its decorative canvases yield between draws.
-- Added an outcome-based browser regression test: it blocks the app bundle,
-  verifies the visible demo shell is already complete, then measures a mobile
-  layout-shift total below 0.01.
-- Kept the route-mode shell in the PWA precache and made its host cache policy
-  revalidate on every load.
-- Removed remaining decorative/mood copy from the product, legal pages, and
-  404 page. The refreshed copy audit is in `.factory/copy-audit.md`.
-
-## Verification
-
-From the documented clean setup:
+## Verification commands
 
 ```sh
 npm ci
@@ -47,54 +38,24 @@ npm run typecheck
 npm run build
 ```
 
-- `npm ci`: pass; 60 packages, 0 vulnerabilities.
-- `npm test`: pass; 10 Vitest assertions and 23 Playwright checks.
-- `npm run typecheck` and `npm run build`: pass; `dist/` created.
-- Every exact command in `.factory/claims.json`: pass individually (15/15).
-- Built initial JavaScript is 30.78 KB raw / 11.32 KB gzip; CSS is 22.13 KB
-  raw / 5.74 KB gzip.
+Every exact command in `.factory/claims.json` was also run separately. Live
+checks covered fresh desktop and phone first screens, populated demo output,
+real/demo storage isolation, reset/exit, normal and invalid recording paths,
+four-second stopping, malformed import recovery, keyboard/dialog focus,
+reduced motion, axe, offline reload, route titles, links, headers, 404 behavior,
+asset identity, Lighthouse, Chromium, Firefox, and WebKit.
 
-Fresh live checks after deployment:
+## Next steps
 
-- SHA-256 comparison: all 24 deployable files matched `dist/` byte-for-byte.
-- Fresh desktop and 390 px phone contexts identify the job, audience, and
-  sample action without scrolling. The demo shows four recordings, a sample
-  guess, the persistent banner, Reset demo, and Start for real. Reset restores
-  all four samples; Start for real deletes the `demo:sound-pattern-playground`
-  database before opening the real collection. No console or page errors and
-  no mobile horizontal overflow appeared.
-- Live axe 4.13 scans on `/`, `/demo`, `/privacy/`, `/terms/`, and the designed
-  404 produced zero serious/critical violations on desktop and phone.
-- Live headers include CSP, `Permissions-Policy: microphone=(self)`, HSTS,
-  `Referrer-Policy`, and `X-Content-Type-Options`. The unknown URL returns the
-  designed page with HTTP 404.
-- A fresh live worker controlled `/demo`; after going offline, reload retained
-  the four samples and showed `Offline · local`, with no errors.
-- Lighthouse 13.4 mobile preset, fresh live run:
+1. Make audio Blob persistence work in current WebKit/Safari, add that browser
+   support statement to the claim manifest, and run the demo/storage claim in
+   WebKit.
+2. Replace the offline fallback with a plain recovery page that has the normal
+   skip link, metadata, navigation, footer, and 44-pixel action.
+3. Give root/demo navigation links 44 × 44 CSS-pixel targets.
+4. Use `recording` and `test sound` consistently; remove the remaining lens,
+   shore, field-note, field-kit, specimen, and mystery wording.
+5. Use the required complete footer on Privacy, Terms, and 404 routes.
 
-| Route | Performance | Accessibility | CLS | TBT | LCP |
-| --- | ---: | ---: | ---: | ---: |
-| `/` | 100 | 100 | 0 | 0 ms | 1.54 s |
-| `/demo` | 99 | 100 | 0 | 120 ms | 1.53 s |
-
-## Earlier findings
-
-All earlier verification findings remain resolved: the isolated one-click demo,
-claim manifest/tests, atomic import validation, headers, metadata, designed
-404, immutable built assets, legal skip links/targets, and redundant hero image
-preload were checked in the previous verification and retained in this build.
-The prior release blocker—mobile `/demo` CLS and performance—is resolved by
-this implementation SHA.
-
-## Deployment and scope
-
-`dist/` was deployed to the existing production Static Web App
-`sf-sound-pattern-playground` with its existing `staticwebapp.config.json`.
-No backend, account, billing, external AI feature, tracking, or paid offer is
-part of this free local-first product; those checks are not applicable.
-
-## Known gaps and next steps
-
-No release-blocking gaps are known. The classifier remains deliberately small,
-local, and illustrative; it must not be used for identity, emotion, health,
-medical, safety, or sensitive-trait decisions.
+Re-run independent verification after those repairs. PASS requires zero
+findings and zero untested claims.
